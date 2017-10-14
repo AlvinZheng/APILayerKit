@@ -1,0 +1,6 @@
+framework module Pods_APILayerKitTests {
+  umbrella header "Pods-APILayerKitTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
