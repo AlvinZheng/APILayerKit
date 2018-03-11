@@ -77,7 +77,19 @@ class ApiAccess {
     
     // M : Modle type to parse,should assign a model to parse the respone to get results.
     //
-    func callApi<M: ModelMapAbleFromAF>(api: ApiAccessAble, handler: ResponseHandler<M>) {
+    @discardableResult
+    func callApi<M: ModelMapAbleFromAF>(api: ApiAccessAble, handler: ResponseHandler<M>)
+        -> ResponseHandler<M> {
+//        let innerHanlder: ResponseHandler<M>
+//        if let h = handler {
+//            innerHanlder = h
+//        } else {
+//            innerHanlder = ResponseHandler<M>.init(onSuccess: { _ in
+//
+//            }, onError: { _ in
+//
+//            })
+//        }
         let req = genarateRequest(api: api)
         Alamofire.SessionManager.default.request(req).responseSwiftyJSON() {(response) in
             print(response)
@@ -91,9 +103,10 @@ class ApiAccess {
                 }
             case .failure(let err):
                 handler.onError(err)
-                
+
             }
         }
+        return handler
     }
     
 }
@@ -117,13 +130,32 @@ class ResponseHandler<M: ModelMapAbleFromAF> {
     func onSuccess(response: [M]) {
         onSuccess(response)
     }
-    fileprivate let onSuccess: ([M]) -> Void
-    fileprivate let onError: (_ err: Error) -> Void //print(err.localizeDescreption)}
+    fileprivate var onSuccess: ([M]) -> Void
+    fileprivate var onError: (_ err: Error) -> Void //print(err.localizeDescreption)}
     
     init(onSuccess: @escaping ([M]) -> Void, onError: @escaping (Error) -> Void) {
         self.onSuccess = onSuccess
         self.onError = onError
     }
     
+    convenience init() {
+        self.init(onSuccess: { (_) in
+            
+        }) { (_) in
+            
+        }
+    }
+    
+    @discardableResult
+    func onSuccess(block: @escaping ([M]) -> Void) -> Self {
+        self.onSuccess = block
+        return self
+    }
+    
+    @discardableResult
+    func onError(block: @escaping (Error) -> Void) -> Self {
+        self.onError = block
+        return self
+    }
 }
 

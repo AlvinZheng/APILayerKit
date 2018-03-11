@@ -98,4 +98,14 @@ class ExampleCaller {
         }
         access.callApi(api: UserApi.userInfo(uid:"testid"), handler: handler)
     }
+    
+    func expampleCall2() {
+        let access = ApiAccess()
+        access.callApi(api: UserApi.userInfo(uid:"testid"), handler: ResponseHandler<User>())
+        .onSuccess { (users) in
+            //do something with user
+        }.onError { (err) in
+            //do something with error
+        }
+    }
 }
